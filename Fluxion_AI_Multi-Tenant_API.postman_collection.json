@@ -1,0 +1,1574 @@
+{
+  "info": {
+    "name": "Fluxion AI Multi-Tenant API",
+    "description": "Complete collection for testing all Fluxion AI backend API endpoints with multi-tenant support. Includes admin operations, business data management, and dashboard endpoints.",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// Set base URL if not already set",
+          "if (!pm.variables.get('base_url')) {",
+          "    pm.variables.set('base_url', 'http://localhost:3004');",
+          "}",
+          "",
+          "// Set default tenant if not already set",
+          "if (!pm.variables.get('tenant_code')) {",
+          "    pm.variables.set('tenant_code', 'demo123');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3004",
+      "type": "string"
+    },
+    {
+      "key": "tenant_code",
+      "value": "demo123",
+      "type": "string"
+    },
+    {
+      "key": "test_product_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "test_client_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "test_sale_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🏥 System Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            }
+          }
+        },
+        {
+          "name": "System Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/system/info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "system", "info"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏢 Tenant Administration",
+      "item": [
+        {
+          "name": "Create Tenant - Demo123",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 && pm.response.json().success) {",
+                  "    const tenantData = pm.response.json().data;",
+                  "    pm.variables.set('tenant_code', tenantData.tenant_code);",
+                  "    console.log('✅ Tenant created: ' + tenantData.tenant_code);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenant_code\": \"demo123\",\n  \"company_name\": \"Distribuidora Demo Valencia\",\n  \"contact_person\": \"Freddy Da Silva\",\n  \"email\": \"freddy@distribuidor.com\",\n  \"phone\": \"+58-414-555-1234\",\n  \"address\": \"Av. Bolívar Norte, Valencia\",\n  \"city\": \"Valencia\",\n  \"state\": \"Carabobo\",\n  \"plan\": \"premium\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/tenants",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "tenants"]
+            }
+          }
+        },
+        {
+          "name": "Create Tenant - Test456",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenant_code\": \"test456\",\n  \"company_name\": \"Distribuidora Test Caracas\",\n  \"contact_person\": \"María García\",\n  \"email\": \"maria@testdist.com\",\n  \"phone\": \"+58-212-555-9876\",\n  \"address\": \"Av. Francisco de Miranda, Caracas\",\n  \"city\": \"Caracas\",\n  \"state\": \"Distrito Capital\",\n  \"plan\": \"basic\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/tenants",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "tenants"]
+            }
+          }
+        },
+        {
+          "name": "List All Tenants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/tenants",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "tenants"]
+            }
+          }
+        },
+        {
+          "name": "Get Tenant by Code",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/tenants/{{tenant_code}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "tenants", "{{tenant_code}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Tenant",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_name\": \"Distribuidora Demo Valencia (Actualizada)\",\n  \"phone\": \"+58-414-555-1234\",\n  \"plan\": \"enterprise\",\n  \"max_users\": 20,\n  \"max_products\": 5000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/tenants/{{tenant_code}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "tenants", "{{tenant_code}}"]
+            }
+          }
+        },
+        {
+          "name": "Deactivate Tenant",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/tenants/test456",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "tenants", "test456"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📦 Products API",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/products?active=true&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "active",
+                  "value": "true"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Low Stock Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/products/low-stock",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "low-stock"]
+            }
+          }
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/products/search?q=producto&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "producto"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/products/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/products/{{test_product_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "{{test_product_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 && pm.response.json().success) {",
+                  "    const productData = pm.response.json().data;",
+                  "    pm.variables.set('test_product_id', productData.id.toString());",
+                  "    console.log('✅ Product created with ID: ' + productData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"HARINA-001\",\n  \"name\": \"Harina P.A.N. Precocida 1kg\",\n  \"description\": \"Harina de maíz precocida marca P.A.N. presentación de 1 kilogramo\",\n  \"category\": \"Alimentos Básicos\",\n  \"brand\": \"P.A.N.\",\n  \"cost_price\": 2.50,\n  \"selling_price\": 3.75,\n  \"current_stock\": 500,\n  \"min_stock_threshold\": 50,\n  \"max_stock_threshold\": 2000,\n  \"unit_of_measure\": \"kilogramo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/products",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products"]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"selling_price\": 4.00,\n  \"current_stock\": 450,\n  \"description\": \"Harina de maíz precocida marca P.A.N. presentación de 1 kilogramo - PRECIO ACTUALIZADO\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/products/{{test_product_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "{{test_product_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Deactivate Product",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/products/{{test_product_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "{{test_product_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Clients API",
+      "item": [
+        {
+          "name": "Get All Clients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients?active=true&with_sales_data=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients"],
+              "query": [
+                {
+                  "key": "active",
+                  "value": "true"
+                },
+                {
+                  "key": "with_sales_data",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Clients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/search?q=distribuidora&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "distribuidora"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Overdue Clients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/overdue?days=30",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients", "overdue"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Client Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Client by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{test_client_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients", "{{test_client_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Client Intelligence",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{test_client_id}}/intelligence?days=90",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients", "{{test_client_id}}", "intelligence"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "90"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Client",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 && pm.response.json().success) {",
+                  "    const clientData = pm.response.json().data;",
+                  "    pm.variables.set('test_client_id', clientData.id.toString());",
+                  "    console.log('✅ Client created with ID: ' + clientData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_code\": \"DIST-001\",\n  \"business_name\": \"Distribuidora El Éxito C.A.\",\n  \"contact_person\": \"Carlos Rodríguez\",\n  \"email\": \"carlos@distribuidoraexito.com\",\n  \"phone\": \"+58-241-555-7890\",\n  \"whatsapp\": \"+58-414-555-7890\",\n  \"address\": \"Av. Constitución, Centro Comercial El Éxito, Local 15\",\n  \"city\": \"Valencia\",\n  \"state\": \"Carabobo\",\n  \"client_type\": \"mayorista\",\n  \"tax_id\": \"J-12345678-9\",\n  \"credit_limit\": 50000.00,\n  \"payment_terms\": 30\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/clients",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients"]
+            }
+          }
+        },
+        {
+          "name": "Update Client",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"credit_limit\": 75000.00,\n  \"payment_terms\": 45,\n  \"email\": \"carlos.rodriguez@distribuidoraexito.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{test_client_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients", "{{test_client_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Deactivate Client",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{test_client_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "clients", "{{test_client_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💰 Sales API",
+      "item": [
+        {
+          "name": "Get All Sales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sales?payment_status=pending&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sales"],
+              "query": [
+                {
+                  "key": "payment_status",
+                  "value": "pending"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Sales Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sales/stats?date_from=2025-01-01&date_to=2025-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sales", "stats"],
+              "query": [
+                {
+                  "key": "date_from",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "date_to",
+                  "value": "2025-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Sales by Period",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sales/period/month?date_from=2025-01-01&limit=12",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sales", "period", "month"],
+              "query": [
+                {
+                  "key": "date_from",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "limit",
+                  "value": "12"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Top Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sales/top-products?date_from=2025-01-01&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sales", "top-products"],
+              "query": [
+                {
+                  "key": "date_from",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Sale by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sales/{{test_sale_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sales", "{{test_sale_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Sale",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 && pm.response.json().success) {",
+                  "    const saleData = pm.response.json().data;",
+                  "    pm.variables.set('test_sale_id', saleData.id.toString());",
+                  "    console.log('✅ Sale created with ID: ' + saleData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sale_number\": \"VT-2025-001\",\n  \"client_id\": 1,\n  \"sale_date\": \"2025-08-25\",\n  \"due_date\": \"2025-09-25\",\n  \"payment_method\": \"credito\",\n  \"notes\": \"Venta de productos básicos - pedido especial\",\n  \"details\": [\n    {\n      \"product_id\": 1,\n      \"quantity\": 20,\n      \"unit_price\": 3.75,\n      \"discount_amount\": 0\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/sales",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sales"]
+            }
+          }
+        },
+        {
+          "name": "Update Payment Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_status\": \"paid\",\n  \"payment_method\": \"transferencia\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/sales/{{test_sale_id}}/payment",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sales", "{{test_sale_id}}", "payment"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Sale",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Cliente solicitó cancelación por cambio de pedido\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/sales/{{test_sale_id}}/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sales", "{{test_sale_id}}", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📦 Inventory API",
+      "item": [
+        {
+          "name": "Get Inventory Movements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/movements?movement_type=entrada&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "movements"],
+              "query": [
+                {
+                  "key": "movement_type",
+                  "value": "entrada"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Inventory Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/summary?limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "summary"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get FIFO Valuation",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/valuation",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "valuation"]
+            }
+          }
+        },
+        {
+          "name": "Get Movement Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/stats?date_from=2025-01-01",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "stats"],
+              "query": [
+                {
+                  "key": "date_from",
+                  "value": "2025-01-01"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get High Movement Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/high-movement?days=30&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "high-movement"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Inventory Movement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 1,\n  \"movement_type\": \"entrada\",\n  \"quantity\": 100,\n  \"cost_price\": 2.50,\n  \"reference_type\": \"compra\",\n  \"reference_id\": 1,\n  \"notes\": \"Compra de mercancía nueva - proveedor principal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/inventory/movements",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "movements"]
+            }
+          }
+        },
+        {
+          "name": "Sync Inventory",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sync_data\": [\n    {\n      \"product_id\": 1,\n      \"external_stock\": 600,\n      \"cost_price\": 2.60\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/inventory/sync",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "sync"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧠 Insights API",
+      "item": [
+        {
+          "name": "Get All Insights",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/insights?type=inventory&priority=high&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "insights"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "inventory"
+                },
+                {
+                  "key": "priority",
+                  "value": "high"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Insights Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/insights/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "insights", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Create Manual Insight",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"triggered_by\": \"manual_analysis\",\n  \"type\": \"opportunity\",\n  \"priority\": \"medium\",\n  \"title\": \"Oportunidad de expansión en Caracas\",\n  \"description\": \"Se detectó alta demanda de productos básicos en el área metropolitana de Caracas. Recomendamos evaluar apertura de nuevo punto de distribución.\",\n  \"confidence\": 0.85,\n  \"business_impact\": \"high\",\n  \"actionable_data\": {\n    \"recommended_action\": \"market_expansion\",\n    \"target_area\": \"Caracas\",\n    \"potential_revenue\": 250000,\n    \"investment_required\": 50000\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/insights",
+              "host": ["{{base_url}}"],
+              "path": ["api", "insights"]
+            }
+          }
+        },
+        {
+          "name": "Update Insight Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"read\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/insights/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "insights", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Generate Inventory Insights",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/insights/generate/inventory",
+              "host": ["{{base_url}}"],
+              "path": ["api", "insights", "generate", "inventory"]
+            }
+          }
+        },
+        {
+          "name": "Generate Sales Insights",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/insights/generate/sales",
+              "host": ["{{base_url}}"],
+              "path": ["api", "insights", "generate", "sales"]
+            }
+          }
+        },
+        {
+          "name": "Generate Business Opportunities",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/insights/generate/opportunities",
+              "host": ["{{base_url}}"],
+              "path": ["api", "insights", "generate", "opportunities"]
+            }
+          }
+        },
+        {
+          "name": "Generate All Insights",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/insights/generate/all",
+              "host": ["{{base_url}}"],
+              "path": ["api", "insights", "generate", "all"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup Expired Insights",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/insights/cleanup",
+              "host": ["{{base_url}}"],
+              "path": ["api", "insights", "cleanup"]
+            }
+          }
+        },
+        {
+          "name": "Insights Stream (SSE)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "text/event-stream"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/insights/stream",
+              "host": ["{{base_url}}"],
+              "path": ["api", "insights", "stream"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Dashboard API",
+      "item": [
+        {
+          "name": "Dashboard Overview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/overview",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "overview"]
+            }
+          }
+        },
+        {
+          "name": "Sales Trends",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/sales-trends?period=month&days=90",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "sales-trends"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "month"
+                },
+                {
+                  "key": "days",
+                  "value": "90"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Inventory Analysis",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/inventory-analysis",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "inventory-analysis"]
+            }
+          }
+        },
+        {
+          "name": "Client Insights",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/client-insights",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "client-insights"]
+            }
+          }
+        },
+        {
+          "name": "Dashboard Alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/alerts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "alerts"]
+            }
+          }
+        },
+        {
+          "name": "Generate Dashboard Insights",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant",
+                "value": "{{tenant_code}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/generate-insights",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "generate-insights"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧪 Testing & Demo Scenarios",
+      "item": [
+        {
+          "name": "🎯 Setup Complete Demo Environment",
+          "item": [
+            {
+              "name": "1️⃣ Create Demo Tenant",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tenant_code\": \"demo123\",\n  \"company_name\": \"Distribuidora Demo Valencia\",\n  \"contact_person\": \"Freddy Da Silva\",\n  \"email\": \"freddy@distribuidor.com\",\n  \"phone\": \"+58-414-555-1234\",\n  \"address\": \"Av. Bolívar Norte, Valencia\",\n  \"city\": \"Valencia\",\n  \"state\": \"Carabobo\",\n  \"plan\": \"premium\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/tenants",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "tenants"]
+                }
+              }
+            },
+            {
+              "name": "2️⃣ Create Sample Products",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-Tenant",
+                    "value": "demo123",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sku\": \"HARINA-001\",\n  \"name\": \"Harina P.A.N. Precocida 1kg\",\n  \"description\": \"Harina de maíz precocida marca P.A.N. presentación de 1 kilogramo\",\n  \"category\": \"Alimentos Básicos\",\n  \"brand\": \"P.A.N.\",\n  \"cost_price\": 2.50,\n  \"selling_price\": 3.75,\n  \"current_stock\": 500,\n  \"min_stock_threshold\": 50,\n  \"max_stock_threshold\": 2000\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/products",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "products"]
+                }
+              }
+            },
+            {
+              "name": "3️⃣ Create Sample Client",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-Tenant",
+                    "value": "demo123",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"client_code\": \"DIST-001\",\n  \"business_name\": \"Distribuidora El Éxito C.A.\",\n  \"contact_person\": \"Carlos Rodríguez\",\n  \"email\": \"carlos@distribuidoraexito.com\",\n  \"phone\": \"+58-241-555-7890\",\n  \"address\": \"Av. Constitución, Centro Comercial El Éxito, Local 15\",\n  \"city\": \"Valencia\",\n  \"state\": \"Carabobo\",\n  \"client_type\": \"mayorista\",\n  \"credit_limit\": 50000.00,\n  \"payment_terms\": 30\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/clients",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "clients"]
+                }
+              }
+            },
+            {
+              "name": "4️⃣ Generate All Insights",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-Tenant",
+                    "value": "demo123",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/insights/generate/all",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "insights", "generate", "all"]
+                }
+              }
+            },
+            {
+              "name": "5️⃣ Get Dashboard Overview",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Tenant",
+                    "value": "demo123",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/dashboard/overview",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "dashboard", "overview"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "🚀 Multi-Tenant Isolation Test",
+          "item": [
+            {
+              "name": "Create Second Tenant",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tenant_code\": \"test456\",\n  \"company_name\": \"Distribuidora Test Caracas\",\n  \"contact_person\": \"María García\",\n  \"email\": \"maria@testdist.com\",\n  \"phone\": \"+58-212-555-9876\",\n  \"address\": \"Av. Francisco de Miranda, Caracas\",\n  \"city\": \"Caracas\",\n  \"state\": \"Distrito Capital\",\n  \"plan\": \"basic\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/tenants",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "tenants"]
+                }
+              }
+            },
+            {
+              "name": "Get Products (Tenant Demo123)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Tenant",
+                    "value": "demo123",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/products?active=true",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "products"],
+                  "query": [
+                    {
+                      "key": "active",
+                      "value": "true"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Products (Tenant Test456)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Tenant",
+                    "value": "test456",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/products?active=true",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "products"],
+                  "query": [
+                    {
+                      "key": "active",
+                      "value": "true"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
